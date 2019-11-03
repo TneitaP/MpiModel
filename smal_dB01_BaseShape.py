@@ -1,6 +1,8 @@
 import pickle
 import os
-import open3d as o3d 
+import sys 
+sys.path.append(r"D:\Documents\Git_Hub\TneitaP_repo\SMPL_py37")
+import open3d as o3d
 import numpy as np 
 import com_utils.serialization as pkl_loader
 import com_utils.operate3d as operate3d
@@ -12,6 +14,9 @@ if __name__ == "__main__":
     gm_avg_model = pkl_loader.load_model(avg_model_path)
     avg_ani_mesh = operate3d.catch_model2o3dmesh(gm_avg_model)
     gm_mesh_frame = o3d.geometry.TriangleMesh.create_coordinate_frame(size=0.5, origin=[0, 0, 0])
+    avg_joint_sphere_Lst = operate3d.creat_joint_as_sphereLst(gm_avg_model)
+    operate3d.draw_Obj_Visible([avg_ani_mesh, avg_joint_sphere_Lst, gm_mesh_frame], window_name = "Template mesh")
+
 
     # load typical model
     gm_ani_name_Lst = ["cats", "dogs", "horses", "cows", "hippos"]

@@ -27,4 +27,14 @@ Here is some screen-shot of the two demo.
 | smpl_utils        |  the class definition of SMPL(also for SMAL) |
 | template_pkl      | the parameters of rest shapes(diff identity) and typical poses(diff posed) |
 
+## Installation
+Environment: python3.7; 
+Dependency: numpy, chumpy(only for read old .pkl data format), open3d(Visualization & 3D Operation); 
+
+To create the environment, you can:
+```
+conda create -n smpl37 python=3.7
+pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
+```
+
 

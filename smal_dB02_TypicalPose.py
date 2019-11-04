@@ -27,10 +27,10 @@ def load_std_pose_from_posDic(pmodel, pPose_Dic):
 
 if __name__ == "__main__":
     # step1. load average model
-    avg_model_path = "template_pkl/animal_std_model/smal_CVPR2017.pkl"
-    assert os.path.isfile(avg_model_path), "illegal dir"
-    gm_avg_model = pkl_loader.load_model(avg_model_path)
-    avg_ani_mesh = operate3d.catch_model2o3dmesh(gm_avg_model)
+    rest_model_path = "template_pkl/animal_std_model/smal_CVPR2017.pkl"
+    assert os.path.isfile(rest_model_path), "illegal dir"
+    gm_rest_model = pkl_loader.load_model(rest_model_path)
+    rest_ani_mesh = operate3d.catch_model2o3dmesh(gm_rest_model)
     gm_mesh_frame = o3d.geometry.TriangleMesh.create_coordinate_frame(size=0.5, origin=[0, 0, 0])
 
     # step2. load typical model
@@ -104,15 +104,15 @@ if __name__ == "__main__":
         for idx_i, betas_i in enumerate(typical_data_Dic['toys_betas']):
             print('\t cur family = '+ gm_toys_name_Lst[idx_i] )
             # step41 : load the T pose of different family            
-            gm_avg_model.betas[:] = betas_i[:] #np.array(pose_Dic_j['beta']) full = 41;  PCA(4)
-            gm_avg_model = clear_model_toT(gm_avg_model)
-            cur_ani_mesh = operate3d.catch_model2o3dmesh(gm_avg_model, True)
-            cur_joint_sphere_Lst = operate3d.creat_joint_as_sphereLst(gm_avg_model)
+            gm_rest_model.betas[:] = betas_i[:] #np.array(pose_Dic_j['beta']) full = 41;  PCA(4)
+            gm_rest_model = clear_model_toT(gm_rest_model)
+            cur_ani_mesh = operate3d.catch_model2o3dmesh(gm_rest_model, True)
+            cur_joint_sphere_Lst = operate3d.creat_joint_as_sphereLst(gm_rest_model)
             operate3d.draw_Obj_Visible([cur_ani_mesh, cur_joint_sphere_Lst, 
                                          gm_mesh_frame, ], window_name = "animal-Origin_"+gm_toys_name_Lst[idx_i] +"_shape-" + str(0))
 
             # step42: trans shape using loading pose_Dic_j['pose'] && (J_regressor * Vertices)
-            cur_NewPose_ani_model = load_std_pose_from_posDic(gm_avg_model, pose_Dic_j)
+            cur_NewPose_ani_model = load_std_pose_from_posDic(gm_rest_model, pose_Dic_j)
             cur_NewPose_ani_mesh = operate3d.catch_model2o3dmesh(cur_NewPose_ani_model, True)
             cur_NewPose_joint_sphere_Lst = operate3d.creat_joint_as_sphereLst(cur_NewPose_ani_model)
             operate3d.draw_Obj_Visible([ cur_NewPose_ani_mesh, cur_NewPose_joint_sphere_Lst, 

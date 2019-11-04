@@ -40,7 +40,7 @@ def clear_model_toT(pmodel):
     return pmodel
 
 ####################################
-#  Add to resize model to identical size
+#  Add to resize model to restical size
 def compute_model_range(pmodel):
     ani_mesh = operate3d.catch_model2o3dmesh(pmodel)
     x_max, y_max, z_max = ani_mesh.get_max_bound()
@@ -100,18 +100,18 @@ gm_log_txt_path = r"F:\norigid_STD_SMAL\size_log.txt"
 
 if __name__ == "__main__":
 
-    # step1. load and trans avg_model
-    avg_model_path = "template_pkl/animal_std_model/smal_CVPR2017.pkl"
-    assert os.path.isfile(avg_model_path), "illegal dir"
-    gm_avg_model = pkl_loader.load_model(avg_model_path)
-    # <chumpy.ch.Ch> gm_avg_model.betas[(41L,)] ; gm_avg_model.pose[(99L,)]; gm_avg_model.trans[(3L, )]; 
-    # <chumpy.reordering.transpose>gm_avg_model.J[(33L, 3L)]; <chumpy.reordering.transpose>gm_avg_model.T[(3L, 3889L)];
-    # <numpy.ndarray> gm_avg_model.r(vertices)[(3889L, 3L)]; gm_avg_model.f(faces)[(7774L, 3L)]; 
-    # <scipy.sparse.csc.csc_matrix> gm_avg_model.J_regressor | <numpy.ndarray>(gm_avg_model.J_regressor.toarray())[(33L, 3889L)]
-    avg_ani_mesh = operate3d.catch_model2o3dmesh(gm_avg_model)
+    # step1. load and trans rest_model
+    rest_model_path = "template_pkl/animal_std_model/smal_CVPR2017.pkl"
+    assert os.path.isfile(rest_model_path), "illegal dir"
+    gm_rest_model = pkl_loader.load_model(rest_model_path)
+    # <chumpy.ch.Ch> gm_rest_model.betas[(41L,)] ; gm_rest_model.pose[(99L,)]; gm_rest_model.trans[(3L, )]; 
+    # <chumpy.reordering.transpose>gm_rest_model.J[(33L, 3L)]; <chumpy.reordering.transpose>gm_rest_model.T[(3L, 3889L)];
+    # <numpy.ndarray> gm_rest_model.r(vertices)[(3889L, 3L)]; gm_rest_model.f(faces)[(7774L, 3L)]; 
+    # <scipy.sparse.csc.csc_matrix> gm_rest_model.J_regressor | <numpy.ndarray>(gm_rest_model.J_regressor.toarray())[(33L, 3889L)]
+    rest_ani_mesh = operate3d.catch_model2o3dmesh(gm_rest_model)
     gm_mesh_frame = o3d.geometry.TriangleMesh.create_coordinate_frame(size=0.1, origin=[-0.4, -0.1, 0.3])
-    avg_joint_sphere_Lst = operate3d.creat_joint_as_sphereLst(gm_avg_model)
-    operate3d.draw_Obj_Visible([avg_ani_mesh, avg_joint_sphere_Lst], window_name = "Original Template mesh")
+    rest_joint_sphere_Lst = operate3d.creat_joint_as_sphereLst(gm_rest_model)
+    operate3d.draw_Obj_Visible([rest_ani_mesh, rest_joint_sphere_Lst], window_name = "Original Template mesh")
 
     # step2. load std pose template
     gm_source_pose_path_Lst = [
@@ -189,17 +189,17 @@ if __name__ == "__main__":
             # step1 : load the T pose of different family
             print('\t cur family = '+ gm_toys_name_Lst[idx_i] )
             
-            gm_avg_model.betas[:] = betas_i[:] #np.array(pose_Dic_j['beta']) full = 41;  PCA(4)
-            gm_avg_model = clear_model_toT(gm_avg_model)
-            cur_ani_mesh = operate3d.catch_model2o3dmesh(gm_avg_model, True)
-            cur_joint_sphere_Lst = operate3d.creat_joint_as_sphereLst(gm_avg_model)
+            gm_rest_model.betas[:] = betas_i[:] #np.array(pose_Dic_j['beta']) full = 41;  PCA(4)
+            gm_rest_model = clear_model_toT(gm_rest_model)
+            cur_ani_mesh = operate3d.catch_model2o3dmesh(gm_rest_model, True)
+            cur_joint_sphere_Lst = operate3d.creat_joint_as_sphereLst(gm_rest_model)
             # operate3d.draw_Obj_Visible([cur_ani_mesh, cur_joint_sphere_Lst, 
             #                             gm_mesh_frame, ], window_name = "animal-Origin_"+gm_toys_name_Lst[idx_i] +"_shape-" + str(0))
             
             # step2: trans shape using loading pose_Dic_j['pose'] && (J_regressor * Vertices)
             # pose 迁移过程 [no-rigid process] 
 
-            cur_NewPose_ani_model = load_std_pose_from_posDic(gm_avg_model, pose_Dic_j)
+            cur_NewPose_ani_model = load_std_pose_from_posDic(gm_rest_model, pose_Dic_j)
             cur_NewPose_ani_mesh = operate3d.catch_model2o3dmesh(cur_NewPose_ani_model, True)
             cur_NewPose_joint_sphere_Lst = operate3d.creat_joint_as_sphereLst(cur_NewPose_ani_model)
             # operate3d.draw_Obj_Visible([ cur_NewPose_ani_mesh, cur_NewPose_joint_sphere_Lst, 

@@ -63,7 +63,7 @@ def ready_arguments(pData_Dic):
         # pData_Dic['v_posed'] = pData_Dic['v_shaped'] + pData_Dic['posedirs'].dot(pose_map_ChArr)
         pData_Dic['v_posed'] = pData_Dic['v_shaped'] + ch.dot(pData_Dic['posedirs'], (pose_map_ChArr))
     else:
-        # don't have shape, directly asmal_data_Dic pose
+        # don't have shape, directly aserial_Dic pose
         pData_Dic['v_posed'] = pData_Dic['v_template'] + ch.dot(pData_Dic['posedirs'], (pose_map_ChArr))
     
     pData_Dic['J'] = ch.dot(pData_Dic['J_regressor'].toarray(), pData_Dic['v_posed'])
@@ -71,7 +71,7 @@ def ready_arguments(pData_Dic):
 
 def load_model(pFname):
     
-    smal_data_Dic = pickle.load(open(pFname,'rb'),encoding='latin1')
+    serial_Dic = pickle.load(open(pFname,'rb'),encoding='latin1')
     # .keys() = 'f', 'J_regressor', 'kintree_table', 'J', 'bs_style', 'weights', 'posedirs', 'v_template', 'shapedirs', 'bs_type'
 
     # 1) <np.narray> f (7774,3)
@@ -85,25 +85,25 @@ def load_model(pFname):
     # 5)                                              ['bs_style'] = 'lbs'; 
     # A)                                              ['bs_type'] ='lrotmin'
 
-    backwards_compatibility_replacements(smal_data_Dic)
-    smal_data_Dic = ready_arguments(smal_data_Dic)
+    backwards_compatibility_replacements(serial_Dic)
+    serial_Dic = ready_arguments(serial_Dic)
 
     args_Dic = {
-        'pose': smal_data_Dic['pose'],
-        'v': smal_data_Dic['v_posed'],
-        'J': smal_data_Dic['J'],
-        'weights': smal_data_Dic['weights'],
-        'kintree_table': smal_data_Dic['kintree_table'],
+        'pose': serial_Dic['pose'],
+        'v': serial_Dic['v_posed'],
+        'J': serial_Dic['J'],
+        'weights': serial_Dic['weights'],
+        'kintree_table': serial_Dic['kintree_table'],
         'xp': ch,
         'want_Jtr': True,
-        'bs_style': smal_data_Dic['bs_style']
+        'bs_style': serial_Dic['bs_style']
     }
 
     result, Jtr = verts.verts_core(**args_Dic)
-    result = result + smal_data_Dic['trans'].reshape((1,3))
-    result.J_transformed = Jtr + smal_data_Dic['trans'].reshape((1,3))
+    result = result + serial_Dic['trans'].reshape((1,3))
+    result.J_transformed = Jtr + serial_Dic['trans'].reshape((1,3))
 
-    for k, v in smal_data_Dic.items():
+    for k, v in serial_Dic.items():
         setattr(result, k, v)
     
     return result
@@ -132,14 +132,14 @@ if __name__ == "__main__":
     import open3d as o3d 
     gm_mesh_frame = o3d.geometry.TriangleMesh.create_coordinate_frame(size=0.5, origin=[0, 0, 0])
     # step1. load average model
-    avg_model_path = "template_pkl/animal_std_model/smal_CVPR2017.pkl"
-    assert os.path.isfile(avg_model_path), "illegal dir"
-    gm_avg_model = load_model(avg_model_path)
-    avg_ani_mesh = operate3d.catch_model2o3dmesh(gm_avg_model)
+    rest_model_path = "template_pkl/animal_std_model/smal_CVPR2017.pkl"
+    assert os.path.isfile(rest_model_path), "illegal dir"
+    gm_rest_model = load_model(rest_model_path)
+    rest_ani_mesh = operate3d.catch_model2o3dmesh(gm_rest_model)
     
-    avg_joint_sphere_Lst = operate3d.creat_joint_as_sphereLst(gm_avg_model)
-    operate3d.draw_Obj_Visible([avg_ani_mesh, avg_joint_sphere_Lst, gm_mesh_frame], window_name = "Template mesh")
+    rest_joint_sphere_Lst = operate3d.creat_joint_as_sphereLst(gm_rest_model)
+    operate3d.draw_Obj_Visible([rest_ani_mesh, rest_joint_sphere_Lst, gm_mesh_frame], window_name = "Template mesh")
 
 
     # saving test ...
-    save_model(gm_avg_model, "template_pkl/animal_std_model/smal_VCL2020.pkl")
+    save_model(gm_rest_model, "template_pkl/animal_std_model/smal_VCL2020.pkl")

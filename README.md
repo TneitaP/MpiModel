@@ -6,6 +6,7 @@ Based on the numpy and open3d(0.8.0) in python3.7, we practice the morphing both
 
 ## Teaser
 |    Name    | Usage |
+| ----------        | --- |
 | dB01       |  load rest model from the pkl, and observe the beta para.
 | dB02       |  load typical poses from pkl, and observe the pose para.
 

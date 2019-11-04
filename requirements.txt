@@ -1,4 +1,0 @@
-numpy
-chumpy
-open3d
-opencv-contrib-python

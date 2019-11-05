@@ -5,8 +5,8 @@ import numpy as np
 import open3d as o3d 
 import copy 
 
-import smpl_util.smpl_np as smplnp_load 
-import com_uitil.operate3d as operate3d
+import smpl_utils.smpl_np as smplnp_load 
+import com_uitils.operate3d as operate3d
 
 
 
@@ -139,7 +139,7 @@ def observe_pose_change(pModel, pObserved_dim, pCoord_mode):
 if __name__ == "__main__":
 
     # load shape template. 
-    gm_switch = "animal"
+    gm_switch = "person"
     if gm_switch == "animal":
         rest_model_path = "template_pkl/animal_std_model/rest_animals/smal_rest_dogs.pkl"
         gm_coord_mode = "xzy"

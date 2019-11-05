@@ -6,8 +6,8 @@ import numpy as np
 import open3d as o3d 
 import copy 
 
-import smpl_util.smpl_np as smplnp_load 
-import com_uitil.operate3d as operate3d
+import smpl_utils.smpl_np as smplnp_load 
+import com_uitils.operate3d as operate3d
 
 
 

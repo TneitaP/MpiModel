@@ -1,0 +1,3 @@
+https://github.com/CalciferZh/SMPL
+https://github.com/Lotayou/SMPL
+https://github.com/Lotayou/SMPL/blob/master/smpl_np.py

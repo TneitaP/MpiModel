@@ -140,6 +140,7 @@ class SMPLModel(object):
         # how pose affect body shape in zero pose
         v_posed = v_shaped + self.posedirs.dot(lrotmin)
         # world transformation of each joint
+        # formula(2)(3)(4) in SMPL paper
         G = np.empty((self.kintree_table.shape[1], 4, 4)) # (num_joint,4,4)
         G[0] = self.with_zeros(np.hstack((self.R[0], self.J[0, :].reshape([3, 1]))))
         for i in range(1, self.kintree_table.shape[1]):
@@ -163,10 +164,10 @@ class SMPLModel(object):
         v = np.matmul(T, rest_shape_h.reshape([-1, 4, 1])).reshape([-1, 4])[:, :3]
 
         self.verts = v + self.trans.reshape([1, 3])
-        self.J = self.J_regressor.dot(self.verts)
-    
+        self.J = self.J_regressor.dot(self.verts) # add by Zimeng Zhao    
     def rodrigues(self, r):
         '''
+        formula(1) in SMPL paper
         Rodrigues' rotation formula that turns axis-angle vector into rotation
         matrix in a batch-ed manner.
 
@@ -181,10 +182,13 @@ class SMPLModel(object):
         '''
         theta = np.linalg.norm(r, axis=(1, 2), keepdims=True)
         # avoid zero divide
-        theta = np.maximum(theta, np.finfo(theta.dtype).tiny)
+        theta = np.maximum(theta, np.finfo(theta.dtype).tiny) # 'theta.dtype' edit by Zimeng Zhao    
         r_hat = r / theta
-        cos = np.cos(theta)
+        cosTheta = np.cos(theta)
+        sinTheta = np.sin(theta)
+
         z_stick = np.zeros(theta.shape[0])
+        # m is the skew symmetric of r_hat
         m = np.dstack([
             z_stick, -r_hat[:, 0, 2], r_hat[:, 0, 1],
             r_hat[:, 0, 2], z_stick, -r_hat[:, 0, 0],
@@ -197,7 +201,7 @@ class SMPLModel(object):
         A = np.transpose(r_hat, axes=[0, 2, 1])
         B = r_hat
         dot = np.matmul(A, B)
-        R = cos * i_cube + (1 - cos) * dot + np.sin(theta) * m
+        R = cosTheta * i_cube + (1 - cosTheta) * dot + sinTheta * m
         return R
 
     def with_zeros(self, x):

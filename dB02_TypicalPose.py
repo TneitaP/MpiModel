@@ -139,7 +139,7 @@ def observe_pose_change(pModel, pObserved_dim, pCoord_mode):
 if __name__ == "__main__":
 
     # load shape template. 
-    gm_switch = "person"
+    gm_switch = "animal"
     if gm_switch == "animal":
         rest_model_path = "template_pkl/animal_std_model/rest_animals/smal_rest_dogs.pkl"
         gm_coord_mode = "xzy"

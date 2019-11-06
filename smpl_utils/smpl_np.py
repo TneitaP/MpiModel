@@ -198,10 +198,13 @@ class SMPLModel(object):
             np.expand_dims(np.eye(3), axis=0),
             [theta.shape[0], 3, 3]
         )
-        A = np.transpose(r_hat, axes=[0, 2, 1])
-        B = r_hat
-        dot = np.matmul(A, B)
-        R = cosTheta * i_cube + (1 - cosTheta) * dot + sinTheta * m
+        # mm = m.dot(m)
+        # A = np.transpose(r_hat, axes=[0, 2, 1])
+        # B = r_hat
+        # dot = np.matmul(A, B)
+        # R = cosTheta * i_cube + (1 - cosTheta) * dot + sinTheta * m
+
+        R = i_cube + (1 - cosTheta) * np.matmul(m,m) + sinTheta * m
         return R
 
     def with_zeros(self, x):

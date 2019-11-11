@@ -11,20 +11,22 @@ Based on the numpy and open3d(0.8.0) in python3.7, we deploy the morphing betas 
 | dB02       |  load typical poses from pkl, and observe the pose para.
 
 Here is some screen-shot of the two demo.
-- *demo1*: dB01_LoadShape.py
+- *Demo1*: dB01_LoadShape.py
     
     View how the first 3 **beta[:3]** parameters identify the person and animal.
     Notice that when increasing **beta[0]** , the female become taller while the male become shorter.
 
 ![image](illus/illu_shape_3_s.png)
-- *demo2*: dB02_TypicalPose.py
+- *Demo2*: dB02_TypicalPose.py
+
     View how the first 3 **pose[:3]** parameters(in 1-D scope) influence the model.
     They all control the whole body to rotate w.r.t. **point J[0]**, called " root orientation". 
 ![image](illus/illu_pose_rigid_s.png)
      For the combined influence of the rest parameters in **pose[3:]** cannot be controlled easily, we directly load the **pose[3:]** from the .pkl and can clearly distinguish different poses as following:
 ![image](illus/illu_pose_nonrigid_s.png)
 
-- *demo2*: dB03_Control_pureHand.py
+- *Demo3*: dB03_Control_pureHand.py
+
     Add MANO controller to manipulate the hand only.
     Two hands in different pose:
     ![image](illus/MONO_double.png)
@@ -35,11 +37,11 @@ Here is some screen-shot of the two demo.
     In MANO, its first 3 pose_coeff is the same as SMPL; 
     but the last 45 pose parameter controlled in a PCA-like way. 
     There is a **params['hands_components']** with array_shape (45,45) in template .pkl, 
-    which contains 45 principle components for last 45 pose parameters. 
+    which contains 45 principle components(PC) for last 45 pose parameters. 
     So the post of the last 45 bits can be obtained by multiplying each PC by a scalar weight and summing together. The corresponding scalar weight is called pose_coeff. 
     Finally, **pose_coeff[]** contains the following definition: 
-        + [:3] for global rotation (pi) ;
-        + [(3+x):x]for principle components scalar weight(almost 45); 
+        - [:3] for global rotation (pi) ;
+        - [(3+x):x]for PC scalar weight(almost 45); 
 
     The pose_coeff[3] effect:
     ![image](illus/MONO_pose3.png)

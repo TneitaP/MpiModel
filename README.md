@@ -1,4 +1,4 @@
-# SMPL and SMAL based on py37
+# SMPL, SMAL, MANO based on Numpy (py37)
 
 ## Overview
 
@@ -7,16 +7,18 @@ Based on the numpy and open3d(0.8.0) in python3.7, we deploy the morphing betas 
 ## Teaser
 |    Name    | Usage |
 | ----------        | --- |
-| dB01       |  load rest model from the pkl, and observe the beta para.
-| dB02       |  load typical poses from pkl, and observe the pose para.
+| dB01       |  load rest model from the .pkl, and observe the beta para.
+| dB02       |  load typical poses from .pkl, and observe the pose para.
+| dB03       |  update the MANO(pure hand) support.
 
-Here is some screen-shot of the two demo.
+Here are the illustrations of the 3 demos.
 - *Demo1*: dB01_LoadShape.py
     
     View how the first 3 **beta[:3]** parameters identify the person and animal.
     Notice that when increasing **beta[0]** , the female become taller while the male become shorter.
 
 ![image](illus/illu_shape_3_s.png)
+
 - *Demo2*: dB02_TypicalPose.py
 
     View how the first 3 **pose[:3]** parameters(in 1-D scope) influence the model.
@@ -40,8 +42,9 @@ Here is some screen-shot of the two demo.
     which contains 45 principle components(PC) for last 45 pose parameters. 
     So the post of the last 45 bits can be obtained by multiplying each PC by a scalar weight and summing together. The corresponding scalar weight is called pose_coeff. 
     Finally, **pose_coeff[]** contains the following definition: 
-        - [:3] for global rotation (pi) ;
-        - [(3+x):x]for PC scalar weight(almost 45); 
+
+    * pose_coeff[:3] for global rotation (pi) ;
+    * pose_coeff[(3+x):x]for PC scalar weight(almost 45); 
 
     The pose_coeff[3] effect:
     ![image](illus/MONO_pose3.png)
@@ -59,7 +62,11 @@ Here is some screen-shot of the two demo.
 
 ## Installation
 Environment: python3.7; 
-Dependency: numpy, chumpy(only for read old .pkl data format), open3d(Visualization & 3D Operation); 
+    
+Dependency: 
+* numpy; 
+* chumpy; (only for read old .pkl data format)
+* open3d; (Visualization & 3D Operation); 
 
 To create the environment, you can:
 ```

@@ -118,7 +118,7 @@ def draw_Obj_Visible(obj3d_Lst, window_name, addFrame = False):
         vis.add_geometry(mesh_frame)
     # change render mode
     rdr = vis.get_render_option()
-    # rdr.mesh_show_back_face = True #  advised by Wang 08.18, 2019
+    rdr.mesh_show_back_face = True #  advised by Wang 08.18, 2019
     rdr.point_size = 11.0 # for dB6
     # rdr.mesh_color_option = o3d.visualization.MeshColorOption.ZCoordinate
 

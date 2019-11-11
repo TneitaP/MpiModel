@@ -1,13 +1,19 @@
 # adapted from https://github.com/Lotayou/SMPL/blob/master/smpl_np.py
 # 2019/11/04, ZimengZhao
 '''
-Comparison btw SMPL & SMAL
+Comparison btw SMPL & SMAL                  &&    MANO(pure)
 
-.verts(.r)    (6890, 3)   |  (3889, 3)
-.faces(.f)   (13776, 3)   |  (7774,3)
-.J               (24,3)   |  (33,3)
-.beta             (10,)   |  (41,)
-.pose            (24*3)   |  (33*3)
+.verts(.r)    (6890, 3)   |  (3889, 3)       |    (778, 3)
+.faces(.f)   (13776, 3)   |  (7774,3)        |    (1538,3)
+.J         (23,3)+(1,3)   |  (32,3)+(1,3)    |    (15,3)+(1,3)
+.J_regressor[v->J];  weights[J->v]
+
+.beta             (10,)   |  (41,)           |  (10,)
+.shapedir[S]     (n_v, 3, dim_beta)
+
+.pose            (n_J*)+ 3
+.pose            (24*3)   |  (33*3)     |  (abbravate = 9) ---> (full_pose = 16*3)
+.posedir[P]      (n_v, 3, n_J*9 )
 
 # Relation of (f, v, J)
 mddel.faces are fixed;
@@ -48,9 +54,11 @@ class SMPLModel(object):
             # so the shumpy is still needed when file loading. 
             self.J_regressor = params['J_regressor'] # default <scipy.sparse.csc.csc_matrix>
             self.weights = params['weights'] 
-            self.posedirs = params['posedirs']
+            self.posedirs = params['posedirs'] 
+            # posedirs' shape = (n_verts, 3, n_J * 9); 
+            # pose shape (\theta) = (n_J*3+3)
             self.v_template = params['v_template']
-            self.shapedirs = params['shapedirs'] # default is a <chumpy.ch.Ch>
+            self.shapedirs = params['shapedirs'] # default is a <chumpy.ch.Ch>; 
             self.faces = params['f']
             self.kintree_table = params['kintree_table']
             
@@ -73,13 +81,18 @@ class SMPLModel(object):
             for i in range(1, self.kintree_table.shape[1])
         }
         if class_name == "person":
-            self.pose_shape = [24, 3]
+            self.pose_shape = [24, 3] # dd['pose'] shape = (84)
             self.beta_shape = [10]
             self.trans_shape = [3]
         elif class_name == "animal":
-            self.pose_shape = [33, 3]
+            self.pose_shape = [33, 3] # dd['pose'] shape = (99)
             self.beta_shape = [41]
             self.trans_shape = [3]
+        elif class_name == "pure_hand":
+            self.pose_shape = [16, 3] # dd['fullpose'] shape = (48)
+            self.beta_shape = [10]
+            self.trans_shape = [3]
+            
 
 
         self.pose = np.zeros(self.pose_shape)
@@ -91,7 +104,6 @@ class SMPLModel(object):
         self.R = None
 
         self.update()
-
     def set_params(self, pose=None, beta=None, trans=None):
         '''
         Set pose, shape, and/or translation parameters of SMPL model. Verices of the
@@ -131,7 +143,7 @@ class SMPLModel(object):
         self.J = self.J_regressor.dot(v_shaped)
         pose_cube = self.pose.reshape((-1, 1, 3))
         # rotation matrix for each joint
-        self.R = self.rodrigues(pose_cube) # (n_J, 3, 3)
+        self.R = self.rodrigues(pose_cube) # (n_J, 3, 3), 1st is a global;
         I_cube = np.broadcast_to(
             np.expand_dims(np.eye(3), axis=0),
             (self.R.shape[0]-1, 3, 3)
@@ -165,6 +177,7 @@ class SMPLModel(object):
 
         self.verts = v + self.trans.reshape([1, 3])
         self.J = self.J_regressor.dot(self.verts) # add by Zimeng Zhao    
+    
     def rodrigues(self, r):
         '''
         formula(1) in SMPL paper
@@ -202,11 +215,9 @@ class SMPLModel(object):
         # A = np.transpose(r_hat, axes=[0, 2, 1])
         # B = r_hat
         # dot = np.matmul(A, B)
-        # R = cosTheta * i_cube + (1 - cosTheta) * dot + sinTheta * m
-
+        #R = cosTheta * i_cube + (1 - cosTheta) * dot + sinTheta * m
         R = i_cube + (1 - cosTheta) * np.matmul(m,m) + sinTheta * m
         return R
-
     def with_zeros(self, x):
         '''
         Append a [0, 0, 0, 1] vector to a [3, 4] matrix.
@@ -222,7 +233,6 @@ class SMPLModel(object):
 
         '''
         return np.vstack((x, np.array([[0.0, 0.0, 0.0, 1.0]])))
-
     def pack(self, x):
         '''
         Append zero matrices of shape [4, 3] to vectors of [4, 1] shape in a batched
@@ -253,7 +263,6 @@ class SMPLModel(object):
                 fp.write('v %f %f %f\n' % (v[0], v[1], v[2]))
             for f in self.faces + 1:
                 fp.write('f %d %d %d\n' % (f[0], f[1], f[2]))
-
     def save_to_pkl_model(self, path):
         '''
         Save the SMPL model into .pkl file.
@@ -276,6 +285,42 @@ class SMPLModel(object):
             'bs_style': self.bs_style # may lost
         }   
         pickle.dump(trainer_dict, open(path, 'wb'), -1)
+
+class MANOModel(SMPLModel):
+
+    def __init__(self, model_path, flat_hand_mean=False, v_template=None):
+        super(MANOModel, self).__init__(model_path = model_path, class_name = "pure_hand")
+        # read extra para for hand: 
+        
+        with open(model_path, 'rb') as f:
+            params = pickle.load(f, encoding='latin1')
+            self.hands_components = params['hands_components']
+            # mean shape para of the hand ([3:48])
+            self.hands_mean = np.zeros(self.hands_components.shape[1]) if flat_hand_mean else params['hands_mean']
+            self.hands_coeffs  = params['hands_coeffs'] #[:, :ncomps]
+            # self.selected_components = np.vstack((hands_components[:ncomps]))
+
+            # self.full_hand_pose = pose_coeffs[rot:(rot+ncomps)].dot(selected_components)
+            # self.pose = np.concatenate((pose_coeffs[:rot], hands_mean + full_hand_pose))
+    def set_params(self, pose_coeffs=None, beta=None, trans=None):
+
+        if pose_coeffs is not None: 
+            rot = 3  # pose_coeffs[:3] is for global orientation 
+            ncomps = pose_coeffs.shape[0] - rot # at most = 45
+            selected_components = np.vstack((self.hands_components[:ncomps]))
+            full_hand_pose = pose_coeffs[rot:(rot+ncomps)].dot(selected_components)
+            self.pose = np.concatenate((pose_coeffs[:rot], self.hands_mean + full_hand_pose)).reshape(self.pose_shape)
+            # pose[:3] is the global rotate; 
+            # pose[3: ] control the component select from the self.hands_components
+
+        if beta is not None:
+            self.beta = beta
+        if trans is not None:
+            self.trans = trans
+        self.update()
+        return self.verts
+
+
 
 if __name__ == '__main__':
     smpl = SMPLModel('./model.pkl')

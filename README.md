@@ -20,6 +20,26 @@ Here is some screen-shot of the two demo.
 ![image](illus/illu_pose_rigid_s.png)
 - *dB02*: For the combined influence of the rest parameters in **pose[3:]** cannot be controlled easily, we directly load the **pose[3:]** from the .pkl and can clearly distinguish different poses as following:
 ![image](illus/illu_pose_nonrigid_s.png)
+
+- *dB03*: Add MANO controller to manipulate the hand only.
+ Pose control for MANO is a little different from the former two models. 
+ For a MANO hand, there are totally 15 joints. 
+ According to common sense, the pose should have array_shape in (16*3). 
+ In MANO, its first 3 pose_coeff is the same as SMPL; 
+ but the last 45 pose parameter controlled in a PCA-like way. 
+ There is a **params['hands_components']** with array_shape (45,45) in template .pkl, 
+ which contains 45 principle components for last 45 pose parameters. 
+ So the post of the last 45 bits can be obtained by multiplying each PC by a scalar weight and summing together. The corresponding scalar weight is called pose_coeff. 
+ Finally, **pose_coeff[]** contains the following definition: [:3] for global rotation (pi) + [(3+x):x]for principle components scalar weight(almost 45).
+Two hands in different pose:
+![image](illus/MONO_double.png)
+The pose_coeff[3] effect:
+![image](illus/MONO_pose3.png)
+The pose_coeff[4] effect:
+![image](illus/MONO_pose4.png)
+The pose_coeff[5] effect:
+![image](illus/MONO_pose5.png)
+
 ## File Tree
 |    Folder Name    | Usage |
 | ----------        | --- |

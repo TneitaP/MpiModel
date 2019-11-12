@@ -3,7 +3,11 @@
 ## Overview
 ![image](illus/family_model.png)
 
-Based on the numpy and open3d(0.8.0) in python3.7, we deploy the morphing betas and poses of SMPL and SMAL. This repo can help you learn and debug these two models more efficiently. 
+Based on the numpy and open3d(0.8.0) in python3.7, we deploy the morphing betas and poses of 
+[SMPL](https://smpl.is.tue.mpg.de/), 
+[SMAL](https://ps.is.tuebingen.mpg.de/publications/zuffi-cvpr-2017) 
+and [MANO](https://mano.is.tue.mpg.de/). 
+This repo can help you learn and debug these models more efficiently. 
 
 ## Demo
 |    Name    | Usage |

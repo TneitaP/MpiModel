@@ -13,7 +13,9 @@ Based on the numpy and open3d(0.8.0) in python3.7, we deploy the morphing betas 
 | dB03       |  update the MANO(pure hand) support.
 | dB04       |  update the SMPL with Hand support. 
 
-Here are the illustrations of the 3 demos.
+Here are the illustrations of the 4 demos. demo1 and demo2 are developed for both SMPL and SMAL, 
+demo3 is for MANO, and demo4 for SMPLwMANO.
+
 - *Demo1*: dB01_LoadShape.py
     
     View how the first 3 **beta[:3]** parameters identify the person and animal.

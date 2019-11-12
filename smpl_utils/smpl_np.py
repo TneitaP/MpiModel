@@ -1,19 +1,20 @@
 # adapted from https://github.com/Lotayou/SMPL/blob/master/smpl_np.py
 # 2019/11/04, ZimengZhao
 '''
-Comparison btw SMPL & SMAL                  &&    MANO(pure)
+Comparison btw SMPL             & SMAL            &&    MANO(pure)
 
-.verts(.r)    (6890, 3)   |  (3889, 3)       |    (778, 3)
-.faces(.f)   (13776, 3)   |  (7774,3)        |    (1538,3)
-.J         (23,3)+(1,3)   |  (32,3)+(1,3)    |    (15,3)+(1,3)
+.verts(.r)    (6890, 3)         |  (3889, 3)       |    (778, 3)
+.faces(.f)   (13776, 3)         |  (7774,3)        |    (1538,3)
+.J+1       (23,3)+(1,3)         |  (32,3)+(1,3)    |    (15,3)+(1,3)
 .J_regressor[v->J];  weights[J->v]
 
-.beta             (10,)   |  (41,)           |  (10,)
+.beta             (10,)         |  (41,)           |  (10,)
 .shapedir[S]     (n_v, 3, dim_beta)
 
-.pose            (n_J*)+ 3
-.pose            (24*3)   |  (33*3)     |  (abbravate = 9) ---> (full_pose = 16*3)
-.posedir[P]      (n_v, 3, n_J*9 )
+.pose            (n_J*3)+ 3
+.pose            (24*3)         |  (33*3)          |  (pose_coeff = 9) ---> (full_pose = 16*3)
+.posedir[P]  (6890, 3, 23*9)    |  (3889, 3, 32*3) |  (778, 3, 15*9)
+(n_v, 3, n_J*9 )
 
 # Relation of (f, v, J)
 mddel.faces are fixed;
@@ -81,20 +82,20 @@ class SMPL_Model(object):
             for i in range(1, self.kintree_table.shape[1])
         }
         if class_name == "person":
-            self.pose_shape = [24, 3] # dd['pose'] shape = (84)
+            self.pose_shape = [24, 3] # only depends on joints 23+1
             self.beta_shape = [10]
             self.trans_shape = [3]
         elif class_name == "animal":
-            self.pose_shape = [33, 3] # dd['pose'] shape = (99)
+            self.pose_shape = [33, 3] # only depends on joints 32+1
             self.beta_shape = [41]
             self.trans_shape = [3]
         elif class_name == "pure_hand":
-            self.pose_shape = [16, 3] # dd['fullpose'] shape = (48)
+            self.pose_shape = [16, 3] # only depends on joints 15+1
             self.beta_shape = [10]
             self.trans_shape = [3]
         
-        elif  class_name == "smpl_hand":
-            self.pose_shape = [52, 3] # dd['fullpose'] shape = (48)
+        elif  class_name == "person_wHand":
+            self.pose_shape = [52, 3] # only depends on joints 15+1
             self.beta_shape = [10]
             self.trans_shape = [3]
             
@@ -301,7 +302,7 @@ class MANO_Model(SMPL_Model):
             self.hands_components = params['hands_components']
             # mean shape para of the hand ([3:48])
             self.hands_mean = np.zeros(self.hands_components.shape[1]) if flat_hand_mean else params['hands_mean']
-            self.hands_coeffs  = params['hands_coeffs'] #[:, :ncomps]
+            # self.hands_coeffs  = params['hands_coeffs'] #[:, :ncomps]
             # self.selected_components = np.vstack((hands_components[:ncomps]))
 
             # self.full_hand_pose = pose_coeffs[rot:(rot+ncomps)].dot(selected_components)
@@ -312,8 +313,8 @@ class MANO_Model(SMPL_Model):
             rot = 3  # pose_coeffs[:3] is for global orientation 
             ncomps = pose_coeffs.shape[0] - rot # at most = 45
             selected_components = np.vstack((self.hands_components[:ncomps]))
-            full_hand_pose = pose_coeffs[rot:(rot+ncomps)].dot(selected_components)
-            self.pose = np.concatenate((pose_coeffs[:rot], self.hands_mean + full_hand_pose)).reshape(self.pose_shape)
+            full_hand_pose = pose_coeffs[rot:(rot+ncomps)].dot(selected_components) + self.hands_mean
+            self.pose = np.concatenate((pose_coeffs[:rot], full_hand_pose)).reshape(self.pose_shape)
             # pose[:3] is the global rotate; 
             # pose[3: ] control the component select from the self.hands_components
 
@@ -324,16 +325,69 @@ class MANO_Model(SMPL_Model):
         self.update()
         return self.verts
 
+
+
 class SMPLwH_Model(SMPL_Model):
     def __init__(self, smplwH_model_path, 
-                        left_hand_path, 
-                        right_hand_path, 
-                      flat_hand_mean=False, v_template=None):
-        super(SMPLwH_Model, self).__init__(model_path = smplwH_model_path, class_name = "pure_hand")
-        # read extra para for hand: 
+                        left_hand_path = None, 
+                        right_hand_path = None, 
+                        flat_hand_mean=False, v_template=None):
+        super(SMPLwH_Model, self).__init__(model_path = smplwH_model_path, class_name = "person_wHand")
+        if left_hand_path and right_hand_path:
+            with open(left_hand_path, 'rb') as f:
+                params = pickle.load(f, encoding='latin1')
+                self.left_hands_components = params['hands_components']
+                # mean shape para of the hand ([3:48])
+                self.left_hands_mean = np.zeros(self.hands_components.shape[1]) if flat_hand_mean else params['hands_mean']
+                # self.left_hands_coeffs  = params['hands_coeffs'] #[:, :ncomps]
+            with open(right_hand_path, 'rb') as f:
+                params = pickle.load(f, encoding='latin1')
+                self.right_hands_components = params['hands_components']
+                # mean shape para of the hand ([3:48])
+                self.right_hands_mean = np.zeros(self.hands_components.shape[1]) if flat_hand_mean else params['hands_mean']
+                # self.right_hands_coeffs  = params['hands_coeffs'] #[:, :ncomps]
+    
+    def set_params(self, pose_coeffs=None, beta=None, trans=None):
         
-        # load body para:
+        if pose_coeffs is not None: 
+            rot =66  # pose_coeffs[:66] is for body pose control(body_pose_dofs)
+            
+            assert (pose_coeffs.shape[0] - rot )%2 == 0, "asym para"
+            single_ncomps = (pose_coeffs.shape[0] - rot)//2 # at most = 45
+
+            # for left hand:
+            left_selected_components = np.vstack((self.left_hands_components[:single_ncomps]))
+            left_full_hand_pose = pose_coeffs[rot:(rot+single_ncomps)].dot(left_selected_components) + self.left_hands_mean # (45,) -> (15,3)
+
+            # for right hand:
+            right_selected_components = np.vstack((self.right_hands_components[:single_ncomps]))
+            right_full_hand_pose = pose_coeffs[(rot+single_ncomps):].dot(right_selected_components) + self.right_hands_mean# (45,) -> (15,3)
         
+            complete_pose = np.hstack(
+                (pose_coeffs[:rot], # 66 = j22*3
+                left_full_hand_pose, # 45 = j15*3
+                right_full_hand_pose, # 45 = j15*3
+                ))
+            self.pose = complete_pose.reshape(self.pose_shape)
+        if beta is not None:
+            self.beta = beta
+        if trans is not None:
+            self.trans = trans
+        self.update()
+        return self.verts
+
+    def set_pose_from_smpl_file(self, p_pose_tranform_path):
+        pose_in_Arr = pickle.load(open(p_pose_tranform_path,'rb'),encoding='latin1')['pose'] 
+        pose_in_Arr = pose_in_Arr.reshape((-1, 3)) # 24, 3
+        pose_in_Arr[0] = np.zeros(pose_in_Arr[0].shape)
+
+        complete_pose = self.pose # self.pose shape [52, 3]
+        # assign first (22,3) value
+        complete_pose[:23] = pose_in_Arr[:23] # pose_in_Arr shape [24,3]
+        #self.set_params(pose_coeffs = complete_pose)
+        self.pose = complete_pose
+        self.update()
+
 
 
 

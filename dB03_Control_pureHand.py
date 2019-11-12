@@ -1,5 +1,3 @@
-# Load the rest pose
-# API for both SMPL & SMAL
 import os 
 import pickle 
 import numpy as np 
@@ -66,12 +64,12 @@ if __name__ == "__main__":
 
     gm_rest_model = smplnp_load.MANO_Model(rest_model_path) # flat_hand_mean=True, , flat_hand_mean=True
     rest_mesh = operate3d.catch_model2o3dmesh(gm_rest_model, coord_mode = gm_coord_mode, model_format = "np")
-    rest_joint_sphere_Lst = operate3d.creat_joint_as_sphereLst(gm_rest_model, coord_mode = gm_coord_mode, pRadius=0.015)
+    rest_joint_sphere_Lst = operate3d.creat_joint_as_sphereLst(gm_rest_model, coord_mode = gm_coord_mode, pRadius=0.025)
     
-    # operate3d.draw_Obj_Visible([rest_mesh, g_mesh_frame, rest_joint_sphere_Lst], window_name = "Template mesh")
-    
-    print(np.zeros(6)) 
+    operate3d.draw_Obj_Visible([rest_mesh, g_mesh_frame, rest_joint_sphere_Lst[15]], window_name = "Template mesh")
+    # rest_mesh, 
+    # print(np.zeros(6)) 
     # change the rot and observe the result:
-    observe_shape_change(gm_rest_model, 1)
+    # observe_shape_change(gm_rest_model, 1)
     # observe_pose_change(gm_rest_model, 3) # first 3 dim is global oritation
         

@@ -1,6 +1,7 @@
 # SMPL, SMAL, MANO based on Numpy (py37)
 
 ## Overview
+![image](illus/family_model.png)
 
 Based on the numpy and open3d(0.8.0) in python3.7, we deploy the morphing betas and poses of SMPL and SMAL. This repo can help you learn and debug these two models more efficiently. 
 
@@ -10,6 +11,7 @@ Based on the numpy and open3d(0.8.0) in python3.7, we deploy the morphing betas 
 | dB01       |  load rest model from the .pkl, and observe the beta para.
 | dB02       |  load typical poses from .pkl, and observe the pose para.
 | dB03       |  update the MANO(pure hand) support.
+| dB04       |  update the SMPL with Hand support. 
 
 Here are the illustrations of the 3 demos.
 - *Demo1*: dB01_LoadShape.py
@@ -38,7 +40,7 @@ Here are the illustrations of the 3 demos.
     According to common sense, the pose should have array_shape in (16*3). 
     In MANO, its first 3 pose_coeff is the same as SMPL; 
     but the last 45 pose parameter controlled in a PCA-like way. 
-    There is a **params['hands_components']** with array_shape (45,45) in template .pkl, 
+    There is a **params['hands_components']** with array_shape (45,15*3) in template .pkl, 
     which contains 45 principle components(PC) for last 45 pose parameters. 
     So the post of the last 45 bits can be obtained by multiplying each PC by a scalar weight and summing together. The corresponding scalar weight is called pose_coeff. 
     Finally, **pose_coeff[]** contains the following definition: 
@@ -55,9 +57,27 @@ Here are the illustrations of the 3 demos.
     Fist 3 beta (shape) effect:
     ![image](illus/mano_beta.png)
 
+- *Demo4*: dB04_Control_SMPL+H.py
+
+    For the MANO use the hand in SMPL(same vertex and faces topology), 
+    so these 2 model can be combined to produce richer applications. 
+    ![image](illus/joint_demos.png)
+
+    The combined model load the full topology from the weight file from 
+    'SMPLH_x.pkl', and load the PC of hand from the MANO pkl. 
+    This model use the first 21+1 pose joints in SMPL(**SMPL has 23, del the final two joints of wrist**), 15 joints of left and right hands respectively. 
+    ![image](illus/smplwH_posed.png)
+    So its final pose array_shape is (52*3). In pose control: 
+    - the body part(22*3) is set in a SMPL way;
+    - the two hand parts(15*3) are set in a PC way. 
+
+
+
+
+
 ## File Tree
 |    Folder Name    | Usage |
-| ----------        | --- |
+| ----------        | ---   |
 | com_utils         |  the utilities based on open3d |
 | smpl_utils        |  the class definition of SMPL(also for SMAL) |
 | template_pkl      | the parameters of rest shapes(diff identity) and typical poses(diff posed) |

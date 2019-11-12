@@ -85,7 +85,7 @@ def catch_model_Joint2o3dpcd(pModel, coord_mode = "xzy"):
     q_ani_joint_pcd.paint_uniform_color([1, 0, 0])
     return q_ani_joint_pcd
 
-def creat_joint_as_sphereLst(pModel, coord_mode = "xzy", pRadius= 0.05):
+def creat_joint_as_sphereLst(pModel, coord_mode = "xzy", pRadius= 0.05, smplwH = False):
     # shape (n_points, 3)
     q_ani_joint_pcd = o3d.geometry.PointCloud()
     j_Arr = np.array(pModel.J)
@@ -95,10 +95,13 @@ def creat_joint_as_sphereLst(pModel, coord_mode = "xzy", pRadius= 0.05):
         j_Arr_xzy =j_Arr
     q_sphere_Lst = []
     for idx, point_i_Arr in enumerate(j_Arr_xzy):
-        sphere_i = o3d.geometry.TriangleMesh.create_sphere(radius= pRadius, resolution= 10)
+        if idx >=22 and smplwH:
+            sphere_i = o3d.geometry.TriangleMesh.create_sphere(radius= pRadius/3, resolution= 10)
+        else:
+            sphere_i = o3d.geometry.TriangleMesh.create_sphere(radius= pRadius, resolution= 10)
         sphere_i.translate(point_i_Arr)
         sphere_i.compute_vertex_normals()
-        sphere_i.paint_uniform_color(g_spl_color_Arr[idx])
+        sphere_i.paint_uniform_color(g_spl_color_Arr[idx%len(g_spl_color_Arr)])
         q_sphere_Lst.append(sphere_i)
     return q_sphere_Lst
 
@@ -118,7 +121,7 @@ def draw_Obj_Visible(obj3d_Lst, window_name, addFrame = False):
         vis.add_geometry(mesh_frame)
     # change render mode
     rdr = vis.get_render_option()
-    # rdr.mesh_show_back_face = True #  advised by Wang 08.18, 2019
+    rdr.mesh_show_back_face = True #  advised by Wang 08.18, 2019
     rdr.point_size = 11.0 # for dB6
     # rdr.mesh_color_option = o3d.visualization.MeshColorOption.ZCoordinate
 

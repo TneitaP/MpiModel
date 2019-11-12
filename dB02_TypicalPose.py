@@ -97,7 +97,7 @@ def switch_pose(pModel, pose_path_Lst, pCoord_mode):
         pModel.set_params(pose= needed_pose_Arr)
         posed_mesh = operate3d.catch_model2o3dmesh(pModel, coord_mode = pCoord_mode, model_format = "np")
         posed_joint_sphere_Lst = operate3d.creat_joint_as_sphereLst(pModel, coord_mode = pCoord_mode)
-        operate3d.draw_Obj_Visible([posed_mesh, posed_joint_sphere_Lst, mesh_frame], window_name = "posed mesh")
+        operate3d.draw_Obj_Visible([posed_mesh, posed_joint_sphere_Lst], window_name = "posed mesh")
 
 
 

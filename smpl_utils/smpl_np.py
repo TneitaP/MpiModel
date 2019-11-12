@@ -38,7 +38,7 @@ import numpy as np
 import pickle
 
 
-class SMPLModel(object):
+class SMPL_Model(object):
     def __init__(self, model_path, class_name):
         '''
         SMPL model.
@@ -92,8 +92,12 @@ class SMPLModel(object):
             self.pose_shape = [16, 3] # dd['fullpose'] shape = (48)
             self.beta_shape = [10]
             self.trans_shape = [3]
+        
+        elif  class_name == "smpl_hand":
+            self.pose_shape = [52, 3] # dd['fullpose'] shape = (48)
+            self.beta_shape = [10]
+            self.trans_shape = [3]
             
-
 
         self.pose = np.zeros(self.pose_shape)
         self.beta = np.zeros(self.beta_shape)
@@ -286,7 +290,7 @@ class SMPLModel(object):
         }   
         pickle.dump(trainer_dict, open(path, 'wb'), -1)
 
-class MANOModel(SMPLModel):
+class MANO_Model(SMPLModel):
 
     def __init__(self, model_path, flat_hand_mean=False, v_template=None):
         super(MANOModel, self).__init__(model_path = model_path, class_name = "pure_hand")
@@ -319,6 +323,18 @@ class MANOModel(SMPLModel):
             self.trans = trans
         self.update()
         return self.verts
+
+class SMPLwH_Model(SMPLModel):
+    def __init__(self, smplwH_model_path, 
+                        left_hand_path, 
+                        right_hand_path, 
+                      flat_hand_mean=False, v_template=None):
+        super(SMPLwH_Model, self).__init__(model_path = smplwH_model_path, class_name = "pure_hand")
+        # read extra para for hand: 
+        
+        # load body para:
+        
+
 
 
 

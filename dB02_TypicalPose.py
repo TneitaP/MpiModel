@@ -148,7 +148,7 @@ if __name__ == "__main__":
         rest_model_path = "template_pkl/person_std_model/basicmodel_m_lbs_10_207_0_v1.0.0.pkl"
         gm_coord_mode = "xyz"
         gm_pose_path_Lst = g_person_pose_path_Lst
-    gm_rest_model = smplnp_load.SMPLModel(rest_model_path, class_name= gm_switch)
+    gm_rest_model = smplnp_load.SMPL_Model(rest_model_path, class_name= gm_switch)
     print("oringin pose para:", gm_rest_model.pose.shape, gm_rest_model.pose[0])
     gm_mesh_frame = o3d.geometry.TriangleMesh.create_coordinate_frame(size=0.5, origin=[0, 0, 0])
     rest_mesh = operate3d.catch_model2o3dmesh(gm_rest_model, coord_mode = gm_coord_mode, model_format = "np")

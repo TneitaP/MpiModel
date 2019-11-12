@@ -20,7 +20,7 @@ if __name__ == "__main__":
     elif gm_side == "left": 
         rest_model_path = "template_pkl/hand_std_model/MANO_LEFT.pkl"
 
-    gm_rest_model = smplnp_load.MANOModel(rest_model_path) # flat_hand_mean=True, , flat_hand_mean=True
+    gm_rest_model = smplnp_load.MANO_Model(rest_model_path) # flat_hand_mean=True, , flat_hand_mean=True
     rest_mesh = operate3d.catch_model2o3dmesh(gm_rest_model, coord_mode = gm_coord_mode, model_format = "np")
     rest_joint_sphere_Lst = operate3d.creat_joint_as_sphereLst(gm_rest_model, coord_mode = gm_coord_mode, pRadius=0.015)
     gm_mesh_frame = o3d.geometry.TriangleMesh.create_coordinate_frame(size=0.1, origin=[0, 0, 0])

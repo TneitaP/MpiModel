@@ -78,7 +78,7 @@ if __name__ == "__main__":
     elif gm_switch == "person":
         rest_model_path = "template_pkl/person_std_model/basicmodel_m_lbs_10_207_0_v1.0.0.pkl"
         gm_coord_mode = "xyz"
-    gm_rest_model = smplnp_load.SMPLModel(rest_model_path, class_name= gm_switch)
+    gm_rest_model = smplnp_load.SMPL_Model(rest_model_path, class_name= gm_switch)
     rest_mesh = operate3d.catch_model2o3dmesh(gm_rest_model, coord_mode = gm_coord_mode, model_format = "np")
     rest_joint_sphere_Lst = operate3d.creat_joint_as_sphereLst(gm_rest_model, coord_mode = gm_coord_mode, pRadius=0.08)
 

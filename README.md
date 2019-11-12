@@ -52,6 +52,8 @@ Here are the illustrations of the 3 demos.
     ![image](illus/MONO_pose4.png)
     The pose_coeff[5] effect:
     ![image](illus/MONO_pose5.png)
+    Fist 3 beta (shape) effect:
+    ![image](illus/mano_beta.png)
 
 ## File Tree
 |    Folder Name    | Usage |

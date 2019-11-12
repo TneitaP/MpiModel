@@ -290,10 +290,10 @@ class SMPL_Model(object):
         }   
         pickle.dump(trainer_dict, open(path, 'wb'), -1)
 
-class MANO_Model(SMPLModel):
+class MANO_Model(SMPL_Model):
 
     def __init__(self, model_path, flat_hand_mean=False, v_template=None):
-        super(MANOModel, self).__init__(model_path = model_path, class_name = "pure_hand")
+        super(MANO_Model, self).__init__(model_path = model_path, class_name = "pure_hand")
         # read extra para for hand: 
         
         with open(model_path, 'rb') as f:
@@ -324,7 +324,7 @@ class MANO_Model(SMPLModel):
         self.update()
         return self.verts
 
-class SMPLwH_Model(SMPLModel):
+class SMPLwH_Model(SMPL_Model):
     def __init__(self, smplwH_model_path, 
                         left_hand_path, 
                         right_hand_path, 

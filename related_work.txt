@@ -1,3 +1,35 @@
+Paper:
+@article{loper2015smpl,
+  title={SMPL: A skinned multi-person linear model},
+  author={Loper, Matthew and Mahmood, Naureen and Romero, Javier and Pons-Moll, Gerard and Black, Michael J},
+  journal={ACM transactions on graphics (TOG)},
+  volume={34},
+  number={6},
+  pages={248},
+  year={2015},
+  publisher={ACM}
+}
+
+@inproceedings{zuffi20173d,
+  title={3D menagerie: Modeling the 3D shape and pose of animals},
+  author={Zuffi, Silvia and Kanazawa, Angjoo and Jacobs, David W and Black, Michael J},
+  booktitle={Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition},
+  pages={6365--6373},
+  year={2017}
+}
+
+@article{romero2017embodied,
+  title={Embodied hands: Modeling and capturing hands and bodies together},
+  author={Romero, Javier and Tzionas, Dimitrios and Black, Michael J},
+  journal={ACM Transactions on Graphics (TOG)},
+  volume={36},
+  number={6},
+  pages={245},
+  year={2017},
+  publisher={ACM}
+}
+
+Repo:
 https://github.com/CalciferZh/SMPL
 https://github.com/Lotayou/SMPL
 https://github.com/Lotayou/SMPL/blob/master/smpl_np.py

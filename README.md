@@ -5,7 +5,7 @@
 
 Based on the numpy and open3d(0.8.0) in python3.7, we deploy the morphing betas and poses of SMPL and SMAL. This repo can help you learn and debug these two models more efficiently. 
 
-## Teaser
+## Demo
 |    Name    | Usage |
 | ----------        | --- |
 | dB01       |  load rest model from the .pkl, and observe the beta para.

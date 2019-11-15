@@ -99,7 +99,14 @@ Dependency:
 To create the environment, you can:
 ```
 conda create -n smpl37 python=3.7
+git clone -b np_pure https://github.com/TneitaP/SMPL_py37.git
 pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
 ```
 (Nevertheless, chumpy is also needed for some original pikle loading process for **Shape blendshapes** (params['shapedirs'] in the code), but we don't use it when computing. )
 
+To get more Fast git clone speed, you can (with Agency):
+
+```
+git config --global http.proxy socks5://127.0.0.1:1080
+git config --global https.proxy socks5://127.0.0.1:1080
+```

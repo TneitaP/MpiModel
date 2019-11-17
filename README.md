@@ -103,3 +103,7 @@ pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
 ```
 (Nevertheless, chumpy is also needed for some original pikle loading process for **Shape blendshapes** (params['shapedirs'] in the code), but we don't use it when computing. )
 
+## Acknowledgement
+Thanks for the help provided by [Ren](https://github.com/MrPhD) *et al.* in [VCL](https://yangangwang.com/), specifically in model discussing and template providing. 
+
+

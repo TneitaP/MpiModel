@@ -80,10 +80,10 @@ if __name__ == "__main__":
         gm_coord_mode = "xyz"
     gm_rest_model = smplnp_load.SMPL_Model(rest_model_path, class_name= gm_switch)
     rest_mesh = operate3d.catch_model2o3dmesh(gm_rest_model, coord_mode = gm_coord_mode, model_format = "np")
-    rest_joint_sphere_Lst = operate3d.creat_joint_as_sphereLst(gm_rest_model, coord_mode = gm_coord_mode, pRadius=0.15)
+    rest_joint_sphere_Lst = operate3d.creat_joint_as_sphereLst(gm_rest_model, coord_mode = gm_coord_mode, pRadius=0.1)
 
     gm_mesh_frame = o3d.geometry.TriangleMesh.create_coordinate_frame(size=0.5, origin=[0, 0, 0])
-    operate3d.draw_Obj_Visible([rest_mesh, gm_mesh_frame, rest_joint_sphere_Lst, window_name = "Template mesh")
+    operate3d.draw_Obj_Visible([rest_mesh, gm_mesh_frame, rest_joint_sphere_Lst], window_name = "Template mesh")
 
     # switch_animal_identity(gm_rest_model, iden_collection_path, view_collection = "cluster") # "cluster"
     

@@ -66,7 +66,7 @@ if __name__ == "__main__":
     rest_mesh = operate3d.catch_model2o3dmesh(gm_rest_model, coord_mode = gm_coord_mode, model_format = "np")
     rest_joint_sphere_Lst = operate3d.creat_joint_as_sphereLst(gm_rest_model, coord_mode = gm_coord_mode, pRadius=0.025)
     
-    operate3d.draw_Obj_Visible([rest_mesh, g_mesh_frame, rest_joint_sphere_Lst[15]], window_name = "Template mesh")
+    operate3d.draw_Obj_Visible([rest_mesh, g_mesh_frame], window_name = "Template mesh") # rest_joint_sphere_Lst[15]
     # rest_mesh, 
     # print(np.zeros(6)) 
     # change the rot and observe the result:

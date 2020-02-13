@@ -77,7 +77,8 @@ class SMPL_Model(object):
         id_to_col = {
             self.kintree_table[1, i]: i for i in range(self.kintree_table.shape[1])
         }
-        self.parent = {
+        # self.parent_Dic record the parent of each joint (from 1to 23)
+        self.parent_Dic = {
             i: id_to_col[self.kintree_table[0, i]]
             for i in range(1, self.kintree_table.shape[1])
         }
@@ -153,36 +154,41 @@ class SMPL_Model(object):
             np.expand_dims(np.eye(3), axis=0),
             (self.R.shape[0]-1, 3, 3)
         ) # (n_J, ([[1,0], [0,1]]))
+        # use lrotmin rather than self.R[1:]
+        # guarantees that the contribution of the pose blend 
+        # shapes is zero in the rest pose
         lrotmin = (self.R[1:] - I_cube).ravel() # ((n_J-1)*3*3, )
         # how pose affect body shape in zero pose
         v_posed = v_shaped + self.posedirs.dot(lrotmin)
         # world transformation of each joint
         # formula(2)(3)(4) in SMPL paper
+        # G[k] is the world transformation of joint k
         G = np.empty((self.kintree_table.shape[1], 4, 4)) # (num_joint,4,4)
         G[0] = self.with_zeros(np.hstack((self.R[0], self.J[0, :].reshape([3, 1]))))
         for i in range(1, self.kintree_table.shape[1]):
-            G[i] = G[self.parent[i]].dot(
+            G[i] = G[self.parent_Dic[i]].dot(
                 self.with_zeros(
                     np.hstack(
-                        [self.R[i],((self.J[i, :]-self.J[self.parent[i],:]).reshape([3,1]))]
-                    )
-                )
-            )
+                        [self.R[i],((self.J[i, :]-self.J[self.parent_Dic[i],:]).reshape([3,1]))]
+                            )
+                                )   
+                                            )
         # remove the transformation due to the rest pose
-        G = G - self.pack(
-            np.matmul(
-                G,
-                np.hstack([self.J, np.zeros([self.pose_shape[0], 1])]).reshape([self.pose_shape[0], 4, 1])
-                )
-            )
-        # transformation of each vertex
-        T = np.tensordot(self.weights, G, axes=[[1], [0]])
-        rest_shape_h = np.hstack((v_posed, np.ones([v_posed.shape[0], 1])))
-        v = np.matmul(T, rest_shape_h.reshape([-1, 4, 1])).reshape([-1, 4])[:, :3]
+        # re-edited in 2020/02/11, Lanzhou, Home
+        G[:, :3,3] -= np.matmul(G[:, :3,:3], self.J.reshape([self.kintree_table.shape[1], 3,1])).reshape([self.kintree_table.shape[1],3])
+        # equals to
+        self.J = np.matmul(G[:,:3,:3], self.J.reshape([-1, 3, 1])).reshape([-1, 3])+ G[:,:3,3]
+        # self.J = self.J_regressor.dot(self.verts) # add by Zimeng Zhao
 
-        self.verts = v + self.trans.reshape([1, 3])
-        self.J = self.J_regressor.dot(self.verts) # add by Zimeng Zhao    
-    
+        # transformation of each vertex
+        # re-edited in 2020/02/11, Lanzhou, Home
+        H = np.tensordot(self.weights, G, axes=[[1], [0]])
+        v_bias = np.matmul(H[:,:3,:3], v_posed.reshape([-1, 3, 1])).reshape([-1, 3]) + H[:,:3, 3]
+        self.verts = v_bias + self.trans.reshape([1, 3])
+        
+        
+
+
     def rodrigues(self, r):
         '''
         formula(1) in SMPL paper
@@ -238,21 +244,6 @@ class SMPL_Model(object):
 
         '''
         return np.vstack((x, np.array([[0.0, 0.0, 0.0, 1.0]])))
-    def pack(self, x):
-        '''
-        Append zero matrices of shape [4, 3] to vectors of [4, 1] shape in a batched
-        manner.
-
-        Parameter:
-        ----------
-        x: Matrices to be appended of shape [batch_size, 4, 1]
-
-        Return:
-        ------
-        Matrix of shape [batch_size, 4, 4] after appending.
-
-        '''
-        return np.dstack((np.zeros((x.shape[0], 4, 3)), x))
 
     def save_to_obj(self, path):
         '''

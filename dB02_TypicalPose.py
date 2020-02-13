@@ -94,7 +94,16 @@ def switch_pose(pModel, pose_path_Lst, pCoord_mode):
         pose_Dic_j = pickle.load(open(pose_Dic_j_path,'rb'),encoding='latin1')
         print(pose_Dic_j.keys())
         needed_pose_Arr = get_pose_para_from_file_Dic(pose_Dic_j)
+
+        print("before:")
+        posed_mesh = operate3d.catch_model2o3dmesh(pModel, coord_mode = pCoord_mode, model_format = "np")
+        posed_joint_sphere_Lst = operate3d.creat_joint_as_sphereLst(pModel, coord_mode = pCoord_mode)
+        operate3d.draw_Obj_Visible([posed_mesh, posed_joint_sphere_Lst], window_name = "posed mesh")
+
+
         pModel.set_params(pose= needed_pose_Arr)
+        
+        print("after:")
         posed_mesh = operate3d.catch_model2o3dmesh(pModel, coord_mode = pCoord_mode, model_format = "np")
         posed_joint_sphere_Lst = operate3d.creat_joint_as_sphereLst(pModel, coord_mode = pCoord_mode)
         operate3d.draw_Obj_Visible([posed_mesh, posed_joint_sphere_Lst], window_name = "posed mesh")
@@ -139,7 +148,7 @@ def observe_pose_change(pModel, pObserved_dim, pCoord_mode):
 if __name__ == "__main__":
 
     # load shape template. 
-    gm_switch = "animal"
+    gm_switch = "person"
     if gm_switch == "animal":
         rest_model_path = "template_pkl/animal_std_model/rest_animals/smal_rest_dogs.pkl"
         gm_coord_mode = "xzy"
@@ -153,7 +162,7 @@ if __name__ == "__main__":
     gm_mesh_frame = o3d.geometry.TriangleMesh.create_coordinate_frame(size=0.5, origin=[0, 0, 0])
     rest_mesh = operate3d.catch_model2o3dmesh(gm_rest_model, coord_mode = gm_coord_mode, model_format = "np")
     rest_joint_sphere_Lst = operate3d.creat_joint_as_sphereLst(gm_rest_model, coord_mode = gm_coord_mode)
-    operate3d.draw_Obj_Visible([rest_mesh, rest_joint_sphere_Lst, gm_mesh_frame], window_name = "Template mesh")
+    #operate3d.draw_Obj_Visible([rest_mesh, rest_joint_sphere_Lst, gm_mesh_frame], window_name = "Template mesh")
 
     # step2. load typical pose (pose[3:])
     switch_pose(gm_rest_model, gm_pose_path_Lst, gm_coord_mode)

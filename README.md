@@ -43,10 +43,10 @@ demo3 is for MANO, and demo4 for SMPLwMANO.
 
     Pose control for MANO is a little different from the former two models. 
     For a MANO hand, there are totally 15 joints. 
-    According to common sense, the pose should have array_shape in (16*3). 
+    According to common sense, the pose should have array_shape in (16 x 3). 
     In MANO, its first 3 pose_coeff is the same as SMPL; 
     but the last 45 pose parameter controlled in a PCA-like way. 
-    There is a **params['hands_components']** with array_shape (45,15*3) in template .pkl, 
+    There is a **params['hands_components']** with array_shape (45,15 x 3) in template .pkl, 
     which contains 45 principle components(PC) for last 45 pose parameters. 
     So the post of the last 45 bits can be obtained by multiplying each PC by a scalar weight and summing together. The corresponding scalar weight is called pose_coeff. 
     Finally, **pose_coeff[]** contains the following definition: 
@@ -73,9 +73,9 @@ demo3 is for MANO, and demo4 for SMPLwMANO.
     'SMPLH_x.pkl', and load the PC of hand from the MANO pkl. 
     This model use the first 21+1 pose joints in SMPL(**SMPL has 23, del the final two joints of wrist**), 15 joints of left and right hands respectively. 
     ![image](illus/smplwH_posed.png)
-    So its final pose array_shape is (52*3). In pose control: 
-    - the body part(22*3) is set in a SMPL way;
-    - the two hand parts(15*3) are set in a PC way. 
+    So its final pose array_shape is (52 x 3). In pose control: 
+    - the body part(22 x 3) is set in a SMPL way;
+    - the two hand parts(15 x 3) are set in a PC way. 
 
 
 

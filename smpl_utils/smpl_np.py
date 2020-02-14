@@ -145,7 +145,7 @@ class SMPL_Model(object):
         '''
         # how beta affect body shape
         v_shaped = self.shapedirs.dot(self.beta) + self.v_template
-        # joints location
+        # joints location (change the scale)
         self.J = self.J_regressor.dot(v_shaped)
         pose_cube = self.pose.reshape((-1, 1, 3))
         # rotation matrix for each joint
@@ -187,8 +187,6 @@ class SMPL_Model(object):
         self.verts = v_bias + self.trans.reshape([1, 3])
         
         
-
-
     def rodrigues(self, r):
         '''
         formula(1) in SMPL paper
@@ -202,7 +200,6 @@ class SMPL_Model(object):
         Return:
         -------
         Rotation matrix of shape [batch_size, 3, 3].
-
         '''
         theta = np.linalg.norm(r, axis=(1, 2), keepdims=True)
         # avoid zero divide
@@ -298,7 +295,7 @@ class MANO_Model(SMPL_Model):
 
             # self.full_hand_pose = pose_coeffs[rot:(rot+ncomps)].dot(selected_components)
             # self.pose = np.concatenate((pose_coeffs[:rot], hands_mean + full_hand_pose))
-    def set_params(self, pose_coeffs=None, beta=None, trans=None):
+    def set_params_wCoeffs(self, pose_coeffs=None, beta=None, trans=None):
 
         if pose_coeffs is not None: 
             rot = 3  # pose_coeffs[:3] is for global orientation 
